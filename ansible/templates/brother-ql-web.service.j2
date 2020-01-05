@@ -1,0 +1,11 @@
+[Unit]
+Description=Brother QL Web Printer Service
+
+[Service]
+Environment="PATH={{ ql_web_venv }}/bin:/usr/bin:/bin" 
+WorkingDirectory={{ ql_web_working_path }}
+ExecStart={{ ql_web_venv }}/bin/python {{ ql_web_working_path }}/brother_ql_web.py usb://0x04f9:0x2027 --port 8013 --model QL-560 --default-label-size 39x90
+Type=simple
+
+[Install]
+WantedBy=multi-user.target
