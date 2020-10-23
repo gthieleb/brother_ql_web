@@ -1,11 +1,17 @@
 ---
-- hosts: localhost
+- hosts: brother_host
   become: true
   vars:
+    ansible_python_interpreter: /usr/bin/python3
     ql_web_user: qlweb
     ql_web_git_repository: https://github.com/pklaus/brother_ql_web.git
     ql_web_venv: "/home/{{ ql_web_user }}/.virtualenvs/ql"
     ql_web_working_path: "/home/{{ ql_web_user }}/{{ ql_web_git_repository | basename | splitext | first}}"
+    ql_web_packages:
+      - python3-virtualenv
+      - python3-dev
+      - libjpeg-dev
+      - libpng-dev
   handlers:
     - name: daemon reload
       command: systemctl daemon-reload
@@ -15,6 +21,8 @@
         enabled: true
         state: restarted
   tasks:
+    - package: 
+        name: "{{ ql_web_packages }}"
     - user:
         name: "{{ ql_web_user }}"
         createhome: true
@@ -26,7 +34,7 @@
         owner: "{{ ql_web_user }}"
     - pip:
         virtualenv: "{{ ql_web_venv }}"
-        virtualenv_python: /usr/bin/python3
+        virtualenv_command: "/usr/bin/python3 -m venv"
         requirements: "{{ ql_web_working_path }}/requirements.txt"
     - template:
         src: brother-ql-web.service.j2
